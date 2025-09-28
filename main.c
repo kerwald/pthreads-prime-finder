@@ -6,30 +6,33 @@
 void *VerificaPrimo( void *argumento );
 
 typedef struct {
-    int* arg;
-    int inicial;
-    int final;
+    bool* arg;
+    unsigned int inicial;
+    unsigned int final;
 } Info;
 
 int main(){
 
-    int nPrimos = 0;
-    int numThreads = 0;
-    int quantidadePorThreads = 0;
+    unsigned int nPrimos = 0;
+    unsigned int numThreads = 0;
+    unsigned int quantidadePorThreads = 0;
 
     
-    scanf( "%d", &nPrimos );
-    scanf( "%d", &numThreads );
+    scanf( "%u", &nPrimos ); // %u para unsigned int ( valores apenas positivos )
+    scanf( "%u", &numThreads );
 
 
-    int arg[nPrimos];
+    bool arg[nPrimos];
+    for( unsigned int i=0; i<nPrimos; i++ ){
+        arg[i] = false;
+    }
 
     quantidadePorThreads = nPrimos / numThreads;
 
     Info info[numThreads];
     pthread_t thread_id[numThreads];
 
-    for( int i=0; i<numThreads; i++ ){
+    for( unsigned int i=0; i<numThreads; i++ ){ // sempre manter consistencias do tipo usado no for com os tipos das variáveis que for comparar dentro
         if( i==0 ){
             info[i].inicial = 0;
         }else{
@@ -46,13 +49,13 @@ int main(){
         pthread_create ( &thread_id[i], NULL, VerificaPrimo, (void*)&info[i] );
     }
 
-    for( int i=0; i<numThreads; i++ ){
+    for( unsigned int i=0; i<numThreads; i++ ){
         pthread_join( thread_id[i], NULL );
     }
 
-    for( int i=0; i< nPrimos; i++){
-        if( arg[i] == 1 ){
-            printf( " %d ", i );
+    for( unsigned int i=0; i< nPrimos; i++){
+        if( arg[i] == true ){
+            printf( " %u ", i );
         }
     }
 
@@ -62,20 +65,20 @@ int main(){
 void *VerificaPrimo( void *argumento ){
 
     Info info = *(Info*)argumento;
-    int ctrl;
+    bool ctrl;
     
-    for( int i = info.inicial; i <= info.final; i++ ) {
-        ctrl = -1;
-        for( int j = 2; j<i; j++ ){
+    for( unsigned int i = info.inicial; i <= info.final; i++ ) {
+        ctrl = true;
+        for( unsigned int j = 2; j<i; j++ ){
             if( i%j == 0 ){
-                ctrl = 0;
+                ctrl = false;
                 break;
             }
         }
-        if( ctrl == 0 ||  i == 0 || i == 1  ){
-            info.arg[i] = 0;
+        if( ctrl == false ||  i == 0 || i == 1  ){
+            info.arg[i] = false;
         } else{
-            info.arg[i] = 1;
+            info.arg[i] = true;
         }
     
     }
